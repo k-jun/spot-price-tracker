@@ -1,0 +1,33 @@
+service: price-tracker
+
+provider:
+  name: aws
+  runtime: python3.7
+  timeout: 20
+
+  stage: dev
+  region: ap-northeast-1
+
+  environment:
+    REGION: ap-northeast-1
+    INSTANCE_TYPE: p2.xlarge
+    PURCHASE_PRICE: 0.55
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "ec2:Describe*"
+        - "apigateway:*"
+        - "dynamodb:PutItem"
+      Resource: "*"
+
+functions:
+  create_bucket:
+    handler: handler.create_bucket
+  price_register:
+    handler: handler.price_register
+    events:
+      - http:
+          path: /price_register
+          method: get
+          cors: true
